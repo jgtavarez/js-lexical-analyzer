@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JavaScript Lexical Analyzer</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: #f5f5f5;
+        padding: 2rem;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+
+      .analyzer-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        background-color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .input-section,
+      .output-section {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .section-title {
+        font-size: 1.2rem;
+        color: #444;
+        margin-bottom: 1rem;
+      }
+
+      #codeInput {
+        width: 100%;
+        height: 400px;
+        padding: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-family: "Consolas", monospace;
+        resize: none;
+        background-color: #f8f8f8;
+      }
+
+      #lexicalOutput {
+        width: 100%;
+        height: 400px;
+        padding: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f8f8f8;
+        overflow-y: auto;
+        font-family: "Consolas", monospace;
+      }
+
+      .analyze-btn {
+        padding: 0.8rem 2rem;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        margin-top: 1rem;
+        transition: background-color 0.3s;
+      }
+
+      .analyze-btn:hover {
+        background-color: #45a049;
+      }
+
+      .token {
+        padding: 0.2rem 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .token-type {
+        color: #2196f3;
+        font-weight: bold;
+      }
+
+      .token-value {
+        color: #666;
+        margin-left: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>JavaScript Lexical Analyzer</h1>
+      <div class="analyzer-container">
+        <div class="input-section">
+          <h2 class="section-title">Input JavaScript Code</h2>
+          <textarea
+            id="codeInput"
+            placeholder="Enter your JavaScript code here..."
+          ></textarea>
+          <button class="analyze-btn" onclick="analyzeLexically()">
+            Analyze Code
+          </button>
+        </div>
+        <div class="output-section">
+          <h2 class="section-title">Lexical Analysis Result</h2>
+          <div id="lexicalOutput"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      async function analyzeLexically() {
+        const code = document.getElementById("codeInput").value;
+        const outputDiv = document.getElementById("lexicalOutput");
+
+        try {
+          const response = await fetch("http://localhost:3000/analyze", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ code }),
+          });
+
+          const data = await response.json();
+
+          if (data.error) {
+            outputDiv.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+            return;
+          }
+
+          displayResults(data.results);
+        } catch (error) {
+          outputDiv.innerHTML = `<div class="error">Error connecting to the server: ${error.message}</div>`;
+        }
+      }
+
+      function displayResults(results) {
+        const outputDiv = document.getElementById("lexicalOutput");
+        outputDiv.innerHTML = "";
+
+        results.forEach((result) => {
+          const div = document.createElement("div");
+          div.className = "token";
+          div.innerHTML = `<span class="token-type">${result.type}:</span><span class="token-value">${result.value}</span>`;
+          outputDiv.appendChild(div);
+        });
+      }
+    </script>
+  </body>
+</html>
