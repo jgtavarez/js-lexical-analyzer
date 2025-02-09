@@ -16,7 +16,7 @@ This project implements a lexical analyzer for JavaScript code using FLEX (Fast 
 npm install
 ```
 
-3. Compile the FLEX lexer:
+2. Compile the FLEX lexer:
 ```bash
 flex lexer.l
 gcc lex.yy.c -o lexer
@@ -74,3 +74,7 @@ IDENTIFIER: result
 PUNCTUATION: ;
 PUNCTUATION: }
 ```
+
+## Demo
+
+![Demo](.github/demo.gif)
