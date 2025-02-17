@@ -34,26 +34,65 @@ app.post("/analyze", async (req, res) => {
 
     // Execute the FLEX lexer
     exec(`./lexer ${tmpPath}`, (error, stdout) => {
-      cleanupTempFile(tmpPath);
-
       if (error) {
+        cleanupTempFile(tmpPath);
         console.error("Lexer error:", error);
         return res.status(500).json({ error: "Lexer execution failed" });
       }
 
       // Format the result
-      const formatted = stdout
+      const lexicalLines = stdout
         .split("\n")
-        .filter((line) => line.trim())
-        .map((line) => {
-          const [type, ...valueParts] = line.split(":");
-          return {
-            type: type.trim(),
-            value: valueParts.join(":").trim(),
-          };
-        });
+        .filter(
+          (line) =>
+            line.trim() &&
+            !line.startsWith("Parsing") &&
+            !line.startsWith("Syntax")
+        );
 
-      res.json({ results: formatted });
+      const formatted = lexicalLines.map((line) => {
+        const [type, ...valueParts] = line.split(":");
+        return {
+          type: type.trim(),
+          value: valueParts.join(":").trim(),
+        };
+      });
+
+      // Execute the parser
+      exec(
+        `./js_parser ${tmpPath}`,
+        (parserError, parserStdout, parserStderr) => {
+          cleanupTempFile(tmpPath);
+          console.log("parserError:", parserError);
+
+          const parserOutput = [parserStdout, parserStderr]
+            .filter(Boolean)
+            .join("\n");
+
+          const errorCount = parserOutput.match(
+            /Parsing completed with (\d+) errors/
+          );
+          const hasErrors = errorCount && parseInt(errorCount[1]) > 0;
+
+          const errorMessages = parserOutput
+            .split("\n")
+            .filter(
+              (line) =>
+                line.includes("Syntax Error") || line.includes("Expected")
+            )
+            .join("\n");
+
+          const result = {
+            lexical: { results: formatted },
+            syntactic: {
+              valid: !hasErrors,
+              errors: hasErrors ? errorMessages : null,
+            },
+          };
+
+          res.json(result);
+        }
+      );
     });
   } catch (err) {
     if (tmpPath) {

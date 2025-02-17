@@ -1,118 +1,80 @@
 %{
 #include <stdio.h>
 #include <string.h>
+#include "parser.h"
+
+Token current_token;
+int line_number = 1;
+int column_number = 1;
+
+void update_token(TokenType type, char* value) {
+    current_token.type = type;
+    current_token.value = strdup(value);
+    current_token.line = line_number;
+    current_token.column = column_number;
+    column_number += strlen(value);
+}
+
+// Helper function to print token in the original format
+void print_token(const char* type, const char* value) {
+    printf("%s: %s\n", type, value);
+}
 %}
 
 %%
-[ \t\n]+                    { /* Ignore whitespace */ }
+[ \t]+                     { column_number += strlen(yytext); }
+\n                        { line_number++; column_number = 1; }
 
-"//".*                      { printf("COMMENT: %s\n", yytext); }
-[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/] { printf("MULTILINE_COMMENT: %s\n", yytext); }
+"//".*                      { print_token("COMMENT", yytext); update_token(TOKEN_COMMENT, yytext); return TOKEN_COMMENT; }
+[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/] { print_token("COMMENT", yytext); update_token(TOKEN_COMMENT, yytext); return TOKEN_COMMENT; }
 
-"function"                  { printf("KEYWORD: %s\n", yytext); }
-"var"                      { printf("KEYWORD: %s\n", yytext); }
-"let"                      { printf("KEYWORD: %s\n", yytext); }
-"const"                    { printf("KEYWORD: %s\n", yytext); }
-"if"                       { printf("KEYWORD: %s\n", yytext); }
-"else"                     { printf("KEYWORD: %s\n", yytext); }
-"for"                      { printf("KEYWORD: %s\n", yytext); }
-"while"                    { printf("KEYWORD: %s\n", yytext); }
-"do"                       { printf("KEYWORD: %s\n", yytext); }
-"return"                   { printf("KEYWORD: %s\n", yytext); }
-"break"                    { printf("KEYWORD: %s\n", yytext); }
-"continue"                 { printf("KEYWORD: %s\n", yytext); }
-"class"                    { printf("KEYWORD: %s\n", yytext); }
-"async"                    { printf("KEYWORD: %s\n", yytext); }
-"await"                    { printf("KEYWORD: %s\n", yytext); }
-"import"                   { printf("KEYWORD: %s\n", yytext); }
-"export"                   { printf("KEYWORD: %s\n", yytext); }
-"try"                      { printf("KEYWORD: %s\n", yytext); }
-"catch"                    { printf("KEYWORD: %s\n", yytext); }
-"finally"                  { printf("KEYWORD: %s\n", yytext); }
-"throw"                    { printf("KEYWORD: %s\n", yytext); }
-"static"                   { printf("KEYWORD: %s\n", yytext); }
-"super"                    { printf("KEYWORD: %s\n", yytext); }
-"this"                     { printf("KEYWORD: %s\n", yytext); }
-"new"                      { printf("KEYWORD: %s\n", yytext); }
+"function"                  { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"var"                      { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"let"                      { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"const"                    { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"if"                       { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"else"                     { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"for"                      { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"while"                    { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"do"                       { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"return"                   { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"break"                    { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"continue"                 { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"class"                    { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"async"                    { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"await"                    { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"import"                   { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"export"                   { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"try"                      { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"catch"                    { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"finally"                  { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"throw"                    { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"static"                   { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"super"                    { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"this"                     { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
+"new"                      { print_token("KEYWORD", yytext); update_token(TOKEN_KEYWORD, yytext); return TOKEN_KEYWORD; }
 
-"true"|"false"             { printf("BOOLEAN: %s\n", yytext); }
-"null"|"undefined"         { printf("LITERAL: %s\n", yytext); }
+"true"|"false"             { print_token("BOOLEAN", yytext); update_token(TOKEN_BOOLEAN, yytext); return TOKEN_BOOLEAN; }
+"null"|"undefined"         { print_token("LITERAL", yytext); update_token(TOKEN_NULL, yytext); return TOKEN_NULL; }
 
-[0-9]+                     { printf("INTEGER: %s\n", yytext); }
-[0-9]*"."[0-9]+           { printf("FLOAT: %s\n", yytext); }
+[0-9]+                     { print_token("INTEGER", yytext); update_token(TOKEN_NUMBER, yytext); return TOKEN_NUMBER; }
+[0-9]*"."[0-9]+           { print_token("FLOAT", yytext); update_token(TOKEN_NUMBER, yytext); return TOKEN_NUMBER; }
 
-\"([^\"\\]|\\.)*\"        { printf("STRING: %s\n", yytext); }
-\'([^\'\\]|\\.)*\'        { printf("STRING: %s\n", yytext); }
-`([^`\\]|\\.)*`           { printf("TEMPLATE_STRING: %s\n", yytext); }
+\"([^\"\\]|\\.)*\"        { print_token("STRING", yytext); update_token(TOKEN_STRING, yytext); return TOKEN_STRING; }
+\'([^\'\\]|\\.)*\'        { print_token("STRING", yytext); update_token(TOKEN_STRING, yytext); return TOKEN_STRING; }
+`([^`\\]|\\.)*`           { print_token("TEMPLATE_STRING", yytext); update_token(TOKEN_STRING, yytext); return TOKEN_STRING; }
 
-"+"                        { printf("OPERATOR: %s\n", yytext); }
-"-"                        { printf("OPERATOR: %s\n", yytext); }
-"*"                        { printf("OPERATOR: %s\n", yytext); }
-"/"                        { printf("OPERATOR: %s\n", yytext); }
-"%"                        { printf("OPERATOR: %s\n", yytext); }
-"**"                       { printf("OPERATOR: %s\n", yytext); }
-"="                        { printf("OPERATOR: %s\n", yytext); }
-"=="                       { printf("OPERATOR: %s\n", yytext); }
-"==="                      { printf("OPERATOR: %s\n", yytext); }
-"!="                       { printf("OPERATOR: %s\n", yytext); }
-"!=="                      { printf("OPERATOR: %s\n", yytext); }
-">"                        { printf("OPERATOR: %s\n", yytext); }
-"<"                        { printf("OPERATOR: %s\n", yytext); }
-">="                       { printf("OPERATOR: %s\n", yytext); }
-"<="                       { printf("OPERATOR: %s\n", yytext); }
-"++"                       { printf("OPERATOR: %s\n", yytext); }
-"--"                       { printf("OPERATOR: %s\n", yytext); }
-"&&"                       { printf("OPERATOR: %s\n", yytext); }
-"||"                       { printf("OPERATOR: %s\n", yytext); }
-"??"                       { printf("OPERATOR: %s\n", yytext); }
-"!"                        { printf("OPERATOR: %s\n", yytext); }
-"&"                        { printf("OPERATOR: %s\n", yytext); }
-"|"                        { printf("OPERATOR: %s\n", yytext); }
-"^"                        { printf("OPERATOR: %s\n", yytext); }
-"~"                        { printf("OPERATOR: %s\n", yytext); }
-"<<"                       { printf("OPERATOR: %s\n", yytext); }
-">>"                       { printf("OPERATOR: %s\n", yytext); }
-">>>"                      { printf("OPERATOR: %s\n", yytext); }
-"+="                       { printf("OPERATOR: %s\n", yytext); }
-"-="                       { printf("OPERATOR: %s\n", yytext); }
-"*="                       { printf("OPERATOR: %s\n", yytext); }
-"/="                       { printf("OPERATOR: %s\n", yytext); }
-"%="                       { printf("OPERATOR: %s\n", yytext); }
-"**="                      { printf("OPERATOR: %s\n", yytext); }
-"??="                      { printf("OPERATOR: %s\n", yytext); }
-"&&="                      { printf("OPERATOR: %s\n", yytext); }
-"||="                      { printf("OPERATOR: %s\n", yytext); }
-"=>"                       { printf("ARROW: %s\n", yytext); }
+[+\-*/%=<>!&|^~]+         { print_token("OPERATOR", yytext); update_token(TOKEN_OPERATOR, yytext); return TOKEN_OPERATOR; }
 
-"{"                        { printf("PUNCTUATION: %s\n", yytext); }
-"}"                        { printf("PUNCTUATION: %s\n", yytext); }
-"("                        { printf("PUNCTUATION: %s\n", yytext); }
-")"                        { printf("PUNCTUATION: %s\n", yytext); }
-"["                        { printf("PUNCTUATION: %s\n", yytext); }
-"]"                        { printf("PUNCTUATION: %s\n", yytext); }
-";"                        { printf("PUNCTUATION: %s\n", yytext); }
-","                        { printf("PUNCTUATION: %s\n", yytext); }
-"."                        { printf("PUNCTUATION: %s\n", yytext); }
-"..."                      { printf("SPREAD: %s\n", yytext); }
-"?."                       { printf("OPTIONAL_CHAINING: %s\n", yytext); }
+[{}()\[\];,.]             { print_token("PUNCTUATION", yytext); update_token(TOKEN_PUNCTUATION, yytext); return TOKEN_PUNCTUATION; }
 
-[a-zA-Z_$][a-zA-Z0-9_$]*  { printf("IDENTIFIER: %s\n", yytext); }
+[a-zA-Z_$][a-zA-Z0-9_$]*  { print_token("IDENTIFIER", yytext); update_token(TOKEN_IDENTIFIER, yytext); return TOKEN_IDENTIFIER; }
 
-.                         { printf("UNKNOWN: %s\n", yytext); }
+.                         { printf("Error: Unexpected character '%s' at line %d, column %d\n", 
+                                  yytext, line_number, column_number); }
 
 %%
 
 int yywrap() {
     return 1;
-}
-
-int main(int argc, char **argv) {
-    if (argc > 1) {
-        if (!(yyin = fopen(argv[1], "r"))) {
-            perror(argv[1]);
-            return 1;
-        }
-    }
-    yylex();
-    return 0;
 } 

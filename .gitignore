@@ -4,9 +4,10 @@ npm-debug.log
 yarn-debug.log
 yarn-error.log
 
-# FLEX and C generated files
+# FLEX, BISON, and C generated files
 lex.yy.c
 lexer
+js_parser
 
 # Environment variables
 .env

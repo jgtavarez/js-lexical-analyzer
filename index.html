@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JavaScript Lexical Analyzer</title>
+    <title>JavaScript Code Analyzer</title>
     <style>
       * {
         margin: 0;
@@ -30,7 +30,7 @@
 
       .analyzer-container {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 2fr;
         gap: 2rem;
         background-color: white;
         padding: 2rem;
@@ -38,10 +38,15 @@
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       }
 
-      .input-section,
-      .output-section {
+      .input-section {
         display: flex;
         flex-direction: column;
+      }
+
+      .output-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
       }
 
       .section-title {
@@ -61,7 +66,7 @@
         background-color: #f8f8f8;
       }
 
-      #lexicalOutput {
+      #lexicalOutput, #syntacticOutput {
         width: 100%;
         height: 400px;
         padding: 1rem;
@@ -102,11 +107,25 @@
         color: #666;
         margin-left: 0.5rem;
       }
+
+      .error {
+        color: #f44336;
+        padding: 0.5rem;
+        border-left: 3px solid #f44336;
+        background-color: #ffebee;
+      }
+
+      .success {
+        color: #4caf50;
+        padding: 0.5rem;
+        border-left: 3px solid #4caf50;
+        background-color: #e8f5e9;
+      }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1>JavaScript Lexical Analyzer</h1>
+      <h1>JavaScript Code Analyzer</h1>
       <div class="analyzer-container">
         <div class="input-section">
           <h2 class="section-title">Input JavaScript Code</h2>
@@ -114,21 +133,28 @@
             id="codeInput"
             placeholder="Enter your JavaScript code here..."
           ></textarea>
-          <button class="analyze-btn" onclick="analyzeLexically()">
+          <button class="analyze-btn" onclick="analyzeCode()">
             Analyze Code
           </button>
         </div>
         <div class="output-section">
-          <h2 class="section-title">Lexical Analysis Result</h2>
-          <div id="lexicalOutput"></div>
+          <div>
+            <h2 class="section-title">Lexical Analysis</h2>
+            <div id="lexicalOutput"></div>
+          </div>
+          <div>
+            <h2 class="section-title">Syntactic Analysis</h2>
+            <div id="syntacticOutput"></div>
+          </div>
         </div>
       </div>
     </div>
 
     <script>
-      async function analyzeLexically() {
+      async function analyzeCode() {
         const code = document.getElementById("codeInput").value;
-        const outputDiv = document.getElementById("lexicalOutput");
+        const lexicalOutput = document.getElementById("lexicalOutput");
+        const syntacticOutput = document.getElementById("syntacticOutput");
 
         try {
           const response = await fetch("http://localhost:3000/analyze", {
@@ -142,17 +168,20 @@
           const data = await response.json();
 
           if (data.error) {
-            outputDiv.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+            lexicalOutput.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+            syntacticOutput.innerHTML = `<div class="error">Error: ${data.error}</div>`;
             return;
           }
 
-          displayResults(data.results);
+          displayLexicalResults(data.lexical.results);
+          displaySyntacticResults(data.syntactic);
         } catch (error) {
-          outputDiv.innerHTML = `<div class="error">Error connecting to the server: ${error.message}</div>`;
+          lexicalOutput.innerHTML = `<div class="error">Error connecting to the server: ${error.message}</div>`;
+          syntacticOutput.innerHTML = `<div class="error">Error connecting to the server: ${error.message}</div>`;
         }
       }
 
-      function displayResults(results) {
+      function displayLexicalResults(results) {
         const outputDiv = document.getElementById("lexicalOutput");
         outputDiv.innerHTML = "";
 
@@ -162,6 +191,39 @@
           div.innerHTML = `<span class="token-type">${result.type}:</span><span class="token-value">${result.value}</span>`;
           outputDiv.appendChild(div);
         });
+      }
+
+      function displaySyntacticResults(result) {
+        const outputDiv = document.getElementById("syntacticOutput");
+        
+        if (result.valid) {
+          outputDiv.innerHTML = '<div class="success">✓ Code is syntactically valid</div>';
+        } else {
+          let errorHtml = '<div class="error">✗ Syntax errors found:</div>';
+          
+          if (result.errors) {
+            const errorLines = result.errors.split('\n').filter(line => line.trim());
+            const errorList = document.createElement("div");
+            errorList.style.marginTop = "1rem";
+            errorList.style.whiteSpace = "pre-wrap";
+            errorList.style.fontFamily = "monospace";
+            
+            errorLines.forEach(error => {
+              const errorLine = document.createElement("div");
+              errorLine.className = "error-line";
+              errorLine.style.marginBottom = "0.5rem";
+              errorLine.style.paddingLeft = "1rem";
+              errorLine.style.borderLeft = "3px solid #f44336";
+              errorLine.textContent = error;
+              errorList.appendChild(errorLine);
+            });
+            
+            outputDiv.innerHTML = errorHtml;
+            outputDiv.appendChild(errorList);
+          } else {
+            outputDiv.innerHTML = errorHtml + '<div>No detailed error information available.</div>';
+          }
+        }
       }
     </script>
   </body>
