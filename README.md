@@ -48,9 +48,10 @@ npm start
 Input JavaScript code:
 
 ```javascript
-function sum(a, b) {
-  let result = a + b;
-  return result;
+const sum = (a, b) => {
+    // This is a comment
+    let result = a + b;
+    return result;
 }
 ```
 
@@ -81,10 +82,16 @@ PUNCTUATION: ;
 PUNCTUATION: }
 ```
 
+Input JavaScript code:
+
+```javascript
+const name = 'Gabriel'
+```
+
 The syntactic analyzer will output:
 
 ```
-Parsing completed with 0 errors
+Syntax Error at line 0, column 0: Expected semicolon
 ```
 
 ## Demo
