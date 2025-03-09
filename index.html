@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JavaScript Code Analyzer</title>
+    <title>TypeScript Semantic Analyzer</title>
     <style>
       * {
         margin: 0;
@@ -30,7 +30,7 @@
 
       .analyzer-container {
         display: grid;
-        grid-template-columns: 1fr 2fr;
+        grid-template-columns: 1fr 1fr;
         gap: 2rem;
         background-color: white;
         padding: 2rem;
@@ -43,12 +43,6 @@
         flex-direction: column;
       }
 
-      .output-section {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-      }
-
       .section-title {
         font-size: 1.2rem;
         color: #444;
@@ -57,7 +51,7 @@
 
       #codeInput {
         width: 100%;
-        height: 400px;
+        height: 500px;
         padding: 1rem;
         border: 1px solid #ddd;
         border-radius: 5px;
@@ -66,9 +60,9 @@
         background-color: #f8f8f8;
       }
 
-      #lexicalOutput, #syntacticOutput {
+      #semanticOutput {
         width: 100%;
-        height: 400px;
+        height: 500px;
         padding: 1rem;
         border: 1px solid #ddd;
         border-radius: 5px;
@@ -93,26 +87,20 @@
         background-color: #45a049;
       }
 
-      .token {
-        padding: 0.2rem 0;
-        border-bottom: 1px solid #eee;
-      }
-
-      .token-type {
-        color: #2196f3;
-        font-weight: bold;
-      }
-
-      .token-value {
-        color: #666;
-        margin-left: 0.5rem;
-      }
-
       .error {
         color: #f44336;
         padding: 0.5rem;
+        margin-bottom: 0.5rem;
         border-left: 3px solid #f44336;
         background-color: #ffebee;
+      }
+
+      .warning {
+        color: #ff9800;
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        border-left: 3px solid #ff9800;
+        background-color: #fff3e0;
       }
 
       .success {
@@ -121,31 +109,40 @@
         border-left: 3px solid #4caf50;
         background-color: #e8f5e9;
       }
+
+      .code-snippet {
+        font-family: "Consolas", monospace;
+        background-color: #f5f5f5;
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+        border-radius: 3px;
+        font-size: 0.9em;
+      }
+
+      .issue-location {
+        color: #666;
+        font-size: 0.9em;
+        margin-bottom: 0.3rem;
+      }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1>JavaScript Code Analyzer</h1>
+      <h1>TypeScript Semantic Analyzer</h1>
       <div class="analyzer-container">
         <div class="input-section">
-          <h2 class="section-title">Input JavaScript Code</h2>
+          <h2 class="section-title">Input TypeScript Code</h2>
           <textarea
             id="codeInput"
-            placeholder="Enter your JavaScript code here..."
+            placeholder="Enter your TypeScript code here..."
           ></textarea>
           <button class="analyze-btn" onclick="analyzeCode()">
             Analyze Code
           </button>
         </div>
-        <div class="output-section">
-          <div>
-            <h2 class="section-title">Lexical Analysis</h2>
-            <div id="lexicalOutput"></div>
-          </div>
-          <div>
-            <h2 class="section-title">Syntactic Analysis</h2>
-            <div id="syntacticOutput"></div>
-          </div>
+        <div>
+          <h2 class="section-title">Semantic Analysis</h2>
+          <div id="semanticOutput"></div>
         </div>
       </div>
     </div>
@@ -153,8 +150,7 @@
     <script>
       async function analyzeCode() {
         const code = document.getElementById("codeInput").value;
-        const lexicalOutput = document.getElementById("lexicalOutput");
-        const syntacticOutput = document.getElementById("syntacticOutput");
+        const semanticOutput = document.getElementById("semanticOutput");
 
         try {
           const response = await fetch("http://localhost:3000/analyze", {
@@ -168,62 +164,49 @@
           const data = await response.json();
 
           if (data.error) {
-            lexicalOutput.innerHTML = `<div class="error">Error: ${data.error}</div>`;
-            syntacticOutput.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+            semanticOutput.innerHTML = `<div class="error">Error: ${data.error}</div>`;
             return;
           }
 
-          displayLexicalResults(data.lexical.results);
-          displaySyntacticResults(data.syntactic);
+          displaySemanticResults(data);
         } catch (error) {
-          lexicalOutput.innerHTML = `<div class="error">Error connecting to the server: ${error.message}</div>`;
-          syntacticOutput.innerHTML = `<div class="error">Error connecting to the server: ${error.message}</div>`;
+          semanticOutput.innerHTML = `<div class="error">Error connecting to the server: ${error.message}</div>`;
         }
       }
 
-      function displayLexicalResults(results) {
-        const outputDiv = document.getElementById("lexicalOutput");
-        outputDiv.innerHTML = "";
-
-        results.forEach((result) => {
-          const div = document.createElement("div");
-          div.className = "token";
-          div.innerHTML = `<span class="token-type">${result.type}:</span><span class="token-value">${result.value}</span>`;
-          outputDiv.appendChild(div);
-        });
-      }
-
-      function displaySyntacticResults(result) {
-        const outputDiv = document.getElementById("syntacticOutput");
+      function displaySemanticResults(result) {
+        const outputDiv = document.getElementById("semanticOutput");
         
-        if (result.valid) {
-          outputDiv.innerHTML = '<div class="success">✓ Code is syntactically valid</div>';
-        } else {
-          let errorHtml = '<div class="error">✗ Syntax errors found:</div>';
-          
-          if (result.errors) {
-            const errorLines = result.errors.split('\n').filter(line => line.trim());
-            const errorList = document.createElement("div");
-            errorList.style.marginTop = "1rem";
-            errorList.style.whiteSpace = "pre-wrap";
-            errorList.style.fontFamily = "monospace";
-            
-            errorLines.forEach(error => {
-              const errorLine = document.createElement("div");
-              errorLine.className = "error-line";
-              errorLine.style.marginBottom = "0.5rem";
-              errorLine.style.paddingLeft = "1rem";
-              errorLine.style.borderLeft = "3px solid #f44336";
-              errorLine.textContent = error;
-              errorList.appendChild(errorLine);
-            });
-            
-            outputDiv.innerHTML = errorHtml;
-            outputDiv.appendChild(errorList);
-          } else {
-            outputDiv.innerHTML = errorHtml + '<div>No detailed error information available.</div>';
-          }
+        if (!result.issues || result.issues.length === 0) {
+          outputDiv.innerHTML = '<div class="success">✓ No semantic issues found</div>';
+          return;
         }
+
+        outputDiv.innerHTML = '<div class="error">⚠ Semantic issues found:</div>';
+        
+        result.issues.forEach(issue => {
+          const issueDiv = document.createElement("div");
+          issueDiv.className = issue.severity;
+          
+          const locationDiv = document.createElement("div");
+          locationDiv.className = "issue-location";
+          locationDiv.textContent = `Line ${issue.line}, Column ${issue.character}`;
+          
+          const messageDiv = document.createElement("div");
+          messageDiv.textContent = issue.message;
+          
+          issueDiv.appendChild(locationDiv);
+          issueDiv.appendChild(messageDiv);
+          
+          if (issue.code) {
+            const codeDiv = document.createElement("div");
+            codeDiv.className = "code-snippet";
+            codeDiv.textContent = issue.code;
+            issueDiv.appendChild(codeDiv);
+          }
+          
+          outputDiv.appendChild(issueDiv);
+        });
       }
     </script>
   </body>
