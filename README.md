@@ -1,14 +1,11 @@
-# JavaScript Lexical and Syntactic Analyzer
+# JavaScript to Python Converter
 
-This project implements a lexical and syntactic analyzer for JavaScript code using FLEX (Fast Lexical Analyzer Generator) and BISON (Berkeley Software Distribution) with a modern web interface. It uses Node.js for the backend server and vanilla JavaScript for the frontend.
+This project implements a JavaScript to Python code converter with a modern web interface. It uses Node.js for the backend server and vanilla JavaScript for the frontend.
 
 ## Prerequisites
 
 - Node.js
 - npm
-- FLEX (Fast Lexical Analyzer)
-- GCC compiler
-- BISON (Berkeley Software Distribution)
 
 ## Installation
 
@@ -16,12 +13,6 @@ This project implements a lexical and syntactic analyzer for JavaScript code usi
 
 ```bash
 npm install
-```
-
-2. Build the lexical and syntactic analyzers:
-
-```bash
-make clean && make
 ```
 
 ## Running the Application
@@ -36,11 +27,7 @@ npm start
 
 ## Project Structure
 
-- `lexer.l` - FLEX lexical analyzer definition file
-- `parser.c` - C source for syntactic analyzer
-- `parser.h` - Header file with token and parser definitions
-- `Makefile` - Build configuration
-- `server.js` - Node.js backend server
+- `server.js` - Node.js backend server with JavaScript to Python conversion logic
 - `index.html` - Frontend web interface
 
 ## Usage Example
@@ -55,45 +42,37 @@ const sum = (a, b) => {
 }
 ```
 
-The lexical analyzer will output:
+The converter will output the following Python code:
+
+```python
+def sum(a, b):
+    # This is a comment
+    result = a + b
+    return result
 ```
-KEYWORD: const
-IDENTIFIER: sum
-OPERATOR: =
-PUNCTUATION: (
-IDENTIFIER: a
-PUNCTUATION: ,
-IDENTIFIER: b
-PUNCTUATION: )
-OPERATOR: =
-OPERATOR: >
-PUNCTUATION: {
-COMMENT: // This is a comment
-KEYWORD: let
-IDENTIFIER: result
-OPERATOR: =
-IDENTIFIER: a
-OPERATOR: +
-IDENTIFIER: b
-PUNCTUATION: ;
-KEYWORD: return
-IDENTIFIER: result
-PUNCTUATION: ;
-PUNCTUATION: }
-```
+
+Another example:
 
 Input JavaScript code:
 
 ```javascript
-const name = 'Gabriel'
+const name = 'Gabriel';
+console.log(`Hello ${name}!`);
 ```
 
-The syntactic analyzer will output:
+Output Python code:
 
+```python
+name = "Gabriel"
+print(f"Hello {name}!")
 ```
-Syntax Error at line 0, column 0: Expected semicolon
-```
 
-## Demo
+## Features
 
-![Demo](.github/demo.gif)
+The converter supports:
+- Variable declarations
+- Function declarations (including arrow functions)
+- Basic control structures (if/else, loops)
+- Common JavaScript built-ins (console.log -> print)
+- Objects and arrays
+- Basic operators and expressions

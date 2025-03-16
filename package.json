@@ -1,7 +1,7 @@
 {
-  "name": "js-lexical-analyzer",
+  "name": "js-to-python-converter",
   "version": "1.0.0",
-  "description": "JavaScript lexical analyzer using FLEX made for INF-920-001 COMPILADORES (UTESA)",
+  "description": "JavaScript to Python code converter",
   "author": "Juan Gabriel Tavárez López",
   "repository": "jgtavarez/js-lexical-analyzer",
   "main": "server.js",
@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "esprima": "^4.0.1",
+    "escodegen": "^2.1.0"
   }
 } 
