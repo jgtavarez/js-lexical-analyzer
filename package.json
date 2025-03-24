@@ -1,17 +1,14 @@
 {
-  "name": "js-to-python-converter",
-  "version": "1.0.0",
-  "description": "JavaScript to Python code converter",
-  "author": "Juan Gabriel Tavárez López",
-  "repository": "jgtavarez/js-lexical-analyzer",
-  "main": "server.js",
+  "name": "js2py",
+  "version": "0.1.0",
+  "description": "Mini JavaScript to Python compiler",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node src/server.js",
+    "install-deps": "npm install"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "esprima": "^4.0.1",
-    "escodegen": "^2.1.0"
+    "jison": "^0.4.18"
   }
 } 

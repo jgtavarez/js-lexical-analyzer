@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS2PY Compiler</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>JavaScript to Python Compiler</h1>
+    </header>
+    
+    <main>
+        <section class="code-section">
+            <h2>Input JavaScript Code</h2>
+            <textarea id="js-code" placeholder="Enter JavaScript code here..."></textarea>
+            <button id="compile-btn">Compile</button>
+        </section>
+        
+        <section class="results-section">
+            <div class="result-box">
+                <h3>Lexical Analysis</h3>
+                <pre id="tokens-output" class="output"></pre>
+            </div>
+            
+            <div class="result-box">
+                <h3>Syntax Analysis</h3>
+                <pre id="ast-output" class="output"></pre>
+            </div>
+            
+            <div class="result-box">
+                <h3>Symbol Table</h3>
+                <pre id="symbol-table-output" class="output"></pre>
+            </div>
+            
+            <div class="result-box">
+                <h3>Intermediate Code</h3>
+                <pre id="intermediate-code-output" class="output"></pre>
+            </div>
+            
+            <div class="result-box">
+                <h3>Python Code</h3>
+                <pre id="python-code-output" class="output"></pre>
+            </div>
+        </section>
+        
+        <section id="error-section" class="hidden">
+            <h3>Compilation Error</h3>
+            <div id="error-message"></div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>JS2PY Compiler - A mini JavaScript to Python compiler</p>
+    </footer>
+    
+    <script src="script.js"></script>
+</body>
+</html> 
