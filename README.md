@@ -63,4 +63,4 @@ The compiler supports a subset of JavaScript syntax including:
 - `public/`
   - `index.html` - Web interface
   - `styles.css` - CSS styles
-  - `script.js` - Client-side JavaScript
+  - `script.js` - Client-side JavaScript# JS2PY
